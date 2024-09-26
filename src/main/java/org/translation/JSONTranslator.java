@@ -48,13 +48,14 @@ public class JSONTranslator implements Translator {
     @Override
     public List<String> getCountryLanguages(String country) {
         ArrayList<String> languages = new ArrayList<>();
+        String alpha3 = "alpha3";
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject countryLine = jsonArray.getJSONObject(i);
-            if (Objects.equals(countryLine.getString("alpha3"), country.toLowerCase())) {
+            if (Objects.equals(countryLine.getString(alpha3), country.toLowerCase())) {
                 JSONArray keys = countryLine.names();
                 for (int j = 0; j < keys.length(); j++) {
                     String name = keys.getString(j);
-                    if (!("alpha3".equals(name) || "alpha2".equals(name) || "id".equals(name))) {
+                    if (!(alpha3.equals(name) || "alpha2".equals(name) || "id".equals(name))) {
                         languages.add(name);
                     }
                 }
