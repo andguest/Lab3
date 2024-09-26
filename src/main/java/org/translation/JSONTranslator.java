@@ -6,8 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * An implementation of the Translator interface which reads in the translation
@@ -15,7 +17,7 @@ import org.json.JSONArray;
  */
 public class JSONTranslator implements Translator {
 
-    // TODO Task: pick appropriate instance variables for this class
+    private final JSONArray jsonArray;
 
     /**
      * Constructs a JSONTranslator using data from the sample.json resources file.
@@ -35,10 +37,7 @@ public class JSONTranslator implements Translator {
 
             String jsonString = Files.readString(Paths.get(getClass().getClassLoader().getResource(filename).toURI()));
 
-            JSONArray jsonArray = new JSONArray(jsonString);
-
-            // TODO Task: use the data in the jsonArray to populate your instance variables
-            //            Note: this will likely be one of the most substantial pieces of code you write in this lab.
+            this.jsonArray = new JSONArray(jsonString);
 
         }
         catch (IOException | URISyntaxException ex) {
@@ -48,21 +47,35 @@ public class JSONTranslator implements Translator {
 
     @Override
     public List<String> getCountryLanguages(String country) {
-        // TODO Task: return an appropriate list of language codes,
-        //            but make sure there is no aliasing to a mutable object
-        return new ArrayList<>();
+        ArrayList<String> languages = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject countryLine = jsonArray.getJSONObject(i);
+            if (Objects.equals(countryLine.getString("alpha3"), country.toLowerCase())) {
+                JSONArray keys = countryLine.names();
+                for (int j = 0; j < keys.length(); j++) {
+                    String name = keys.getString(j);
+                    if (!("alpha3".equals(name) || "alpha2".equals(name) || "id".equals(name))) {
+                        languages.add(name);
+                    }
+                }
+                return languages;
+            }
+        }
+        return languages;
     }
 
     @Override
     public List<String> getCountries() {
-        // TODO Task: return an appropriate list of country codes,
-        //            but make sure there is no aliasing to a mutable object
-        return new ArrayList<>();
+        ArrayList<String> countries = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            countries.add(jsonArray.getJSONObject(i).getString("alpha3"));
+        }
+        return countries;
     }
 
     @Override
     public String translate(String country, String language) {
-        // TODO Task: complete this method using your instance variables as needed
-        return null;
+        JSONTranslationExample translationExample = new JSONTranslationExample();
+        return translationExample.getCountryNameTranslation(country.toLowerCase(), language);
     }
 }
